@@ -18,6 +18,8 @@ int main()
     float circley = -5.0f;
     unsigned int microsecond = 1000000;
 
+    sf::RectangleShape sfSquares[100];
+
     while (window.isOpen())
     {
 
@@ -27,21 +29,38 @@ int main()
             }
         }
 
-        window.clear(sf::Color(50, 50, 50));
-        window.draw(square);
-        window.draw(circle);
+        // Update program logic here
 
         for(int i = 0; i < squaresLength; i++){
             sf::RectangleShape square({squares[i].x, squares[i].y});
-            square.setFillColor(sf::Color::Red);
-            square.setPosition({squares[i].posx, squares[i].posy});
-            window.draw(square);
+            if(squares[i].active == true && sfSquares[i].getGlobalBounds().findIntersection(circle.getGlobalBounds())){
+                circlex = -circlex;
+                circley = -circley;
+                squares[i].active = false;
+            } else {
+                square.setFillColor(sf::Color::Red);
+                square.setPosition({squares[i].posx, squares[i].posy});
+                sfSquares[i] = square;
+            }
         }
 
+        window.clear(sf::Color(50, 50, 50));
+
+        // Draw here
+
+        for(int i = 0; i < squaresLength; i++){
+            if(squares[i].active){
+                window.draw(sfSquares[i]);
+            }
+        }
+
+        window.draw(square);
+        window.draw(circle);
 
         window.display();
-        circle.move({circlex, circley});
 
+        circle.move({circlex, circley});
+       
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)){
             if(square.getPosition().y < 640){
                 square.move({0.0f, 10.0f});
@@ -77,7 +96,7 @@ int main()
             circlex = -5.0f;
             circley = -5.0f;
             circle.setPosition({360.f, 360.f});
-            usleep(1 * microsecond);
+            usleep(0.5 * microsecond);
         }
 
     }
